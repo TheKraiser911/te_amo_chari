@@ -94,22 +94,38 @@
             z-index: 7;
         }
 
-        /* CUADROS TÁCTILES INVISIBLES ANDROID (ZONAS DE MOVIMIENTO) */
-        #zonas-tactiles {
+        /* CUADROS BOTONES TÁCTILES SOBRE LA RAYA (60px x 60px) */
+        #controles-movil {
             position: absolute;
-            top: 0;
+            bottom: 120px; /* Exactamente alineado verticalmente con el jugador sobre la raya */
             left: 0;
             width: 100%;
-            height: 100%;
-            z-index: 40; /* Por encima del fondo y personajes, por debajo de la interfaz */
+            height: 60px; /* Mismo tamaño de alto del jugador */
+            padding: 0 10px; /* Pequeño margen en las esquinas */
+            z-index: 40;
             display: flex;
+            justify-content: space-between; /* Uno a la izquierda y otro a la derecha */
+            pointer-events: none; /* Deja pasar clicks al fondo si es necesario */
         }
-        .zona-lado {
-            width: 50%;
-            height: 100%;
+        .boton-cuadro {
+            width: 60px;  /* Mismo tamaño del jugador */
+            height: 60px; /* Mismo tamaño del jugador */
+            background: rgba(255, 105, 180, 0.65); /* Rosado semitransparente estético */
+            border: 2px solid #fff;
+            border-radius: 8px; /* Cuadrado con bordes ligeramente suaves */
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
             touch-action: none;
-            /* Descomenta la línea de abajo si quieres ver los cuadros para probar */
-            /* background: rgba(255, 0, 0, 0.05); border: 1px dashed red; */
+            pointer-events: auto; /* Reactiva los toques en los botones */
+        }
+        .boton-cuadro:active {
+            background: #ff1493;
+            transform: scale(0.95);
         }
 
         /* PANTALLAS DE FINAL */
@@ -184,9 +200,9 @@
         <div id="linea-suelo"></div>
         <div id="jugador" class="jugador" style="left: 210px;"></div>
 
-        <div id="zonas-tactiles">
-            <div id="zona-izquierda" class="zona-lado"></div>
-            <div id="zona-derecha" class="zona-lado"></div>
+        <div id="controles-movil">
+            <div id="btn-izquierda" class="boton-cuadro">◀</div>
+            <div id="btn-derecha" class="boton-cuadro">▶</div>
         </div>
 
         <div id="final-tiempo" class="pantalla-final">
@@ -221,7 +237,7 @@
         let jugadorX = 210;
         const velocidadJugador = 7.5;
         let anchoContenedor = contenedor.clientWidth;
-        let juegoActivo = true; // Inicia activado directamente
+        let juegoActivo = true; 
         
         let velocidadCaidaBase = 2.2;
         let tiempoSpawnBase = 1600;
@@ -235,7 +251,7 @@
             return audio;
         }
 
-        // Bucle e intervalos automáticos de inicio
+        // Bucle e intervalos automáticos de inicio inmediato
         intervaloGenerador = setInterval(generarCaedor, tiempoSpawnBase);
         const intervaloTiempo = setInterval(reducirTiempo, 1000);
         const intervaloDificultad = setInterval(aumentarDificultad, 10000); 
@@ -243,33 +259,33 @@
         // VARIABLES DE CONTROL DE ENTRADAS
         window.teclas = {};
 
-        // 1. Detección de Teclado (PC)
+        // 1. Teclado (PC)
         window.addEventListener('keydown', (e) => { if(juegoActivo) teclas[e.code] = true; });
         window.addEventListener('keyup', (e) => { teclas[e.code] = false; });
 
-        // 2. Control por zonas táctiles (Android)
-        document.getElementById('zona-izquierda').addEventListener('touchstart', (e) => {
+        // 2. Control por los nuevos cuadros en las esquinas superiores de la línea (Android)
+        document.getElementById('btn-izquierda').addEventListener('touchstart', (e) => {
             e.preventDefault();
             teclas['ArrowLeft'] = true;
         });
-        document.getElementById('zona-izquierda').addEventListener('touchend', (e) => {
+        document.getElementById('btn-izquierda').addEventListener('touchend', (e) => {
             e.preventDefault();
             teclas['ArrowLeft'] = false;
         });
-        document.getElementById('zona-izquierda').addEventListener('touchcancel', (e) => {
+        document.getElementById('btn-izquierda').addEventListener('touchcancel', (e) => {
             e.preventDefault();
             teclas['ArrowLeft'] = false;
         });
 
-        document.getElementById('zona-derecha').addEventListener('touchstart', (e) => {
+        document.getElementById('btn-derecha').addEventListener('touchstart', (e) => {
             e.preventDefault();
             teclas['ArrowRight'] = true;
         });
-        document.getElementById('zona-derecha').addEventListener('touchend', (e) => {
+        document.getElementById('btn-derecha').addEventListener('touchend', (e) => {
             e.preventDefault();
             teclas['ArrowRight'] = false;
         });
-        document.getElementById('zona-derecha').addEventListener('touchcancel', (e) => {
+        document.getElementById('btn-derecha').addEventListener('touchcancel', (e) => {
             e.preventDefault();
             teclas['ArrowRight'] = false;
         });
@@ -277,17 +293,17 @@
         let corazones = [];
         let caedores = [];
         let tiempoUltimoDisparo = 0;
-        const cadenciaDisparo = 140; // Ráfaga automática fluida cada 140ms
+        const cadenciaDisparo = 140; // Ráfaga automática continua
 
         function actualizarJuego(tiempoActual) {
             if (!juegoActivo) return;
 
-            // Movimiento basado en teclas físicas o zonas móviles táctiles
+            // Movimiento estable
             if (teclas['ArrowLeft'] || teclas['KeyA']) { if (jugadorX > 0) jugadorX -= velocidadJugador; }
             if (teclas['ArrowRight'] || teclas['KeyD']) { if (jugadorX < anchoContenedor - 60) jugadorX += velocidadJugador; }
             jugador.style.left = jugadorX + 'px';
 
-            // DISPARO AUTOMÁTICO CONTINUO: Siempre dispara si el juego está corriendo
+            // DISPARO AUTOMÁTICO CONTINUO
             if (tiempoActual - tiempoUltimoDisparo > cadenciaDisparo) {
                 crearCorazon();
                 tiempoUltimoDisparo = tiempoActual;
@@ -396,10 +412,10 @@
             
             corazones.forEach(c => c.element.remove());
             caedores.forEach(n => n.element.remove());
-            document.getElementById('zonas-tactiles').style.display = 'none';
+            document.getElementById('controles-movil').style.display = 'none';
         }
 
-        // Iniciar el bucle de renderizado animado
+        // Iniciar loop animado
         requestAnimationFrame(actualizarJuego);
     </script>
 </body>
