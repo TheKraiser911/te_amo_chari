@@ -35,8 +35,72 @@
             box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
             overflow: hidden;
         }
-        /* Interfaz de usuario superior */
+
+        /* PANTALLA DE SELECCIÓN DE MODO */
+        #pantalla-seleccion {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 240, 245, 0.96);
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+        #pantalla-seleccion h1 {
+            color: #ff1493;
+            font-size: 26px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        #pantalla-seleccion p {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 30px;
+        }
+        .contenedor-opciones {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+        .tarjeta-personaje {
+            background: white;
+            border: 3px solid #ffb6c1;
+            border-radius: 15px;
+            padding: 15px;
+            width: 130px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .tarjeta-personaje:active {
+            transform: scale(0.95);
+            border-color: #ff69b4;
+        }
+        .avatar-seleccion {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px auto;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50px;
+            border: 3px solid #ffe4e1;
+        }
+        #avatar-leo { background-image: url('tu_foto.png'); }
+        #avatar-chari { background-image: url('foto_novia.png'); }
+        .tarjeta-personaje span {
+            display: block;
+            font-weight: bold;
+            color: #ff1493;
+            font-size: 14px;
+        }
+
+        /* INTERFAZ EN PARTIDA */
         #interfaz {
+            display: none; /* Se activa al elegir personaje */
             position: absolute;
             top: 15px;
             left: 0;
@@ -55,7 +119,8 @@
             color: #ff1493;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        /* Línea del suelo del Amor */
+
+        /* LÍNEA DEL SUELO */
         #linea-suelo {
             position: absolute;
             bottom: 110px;
@@ -64,13 +129,14 @@
             background: repeating-linear-gradient(90deg, #ff69b4, #ff69b4 10px, transparent 10px, transparent 20px);
             z-index: 5;
         }
-        /* Elementos móviles */
+
+        /* ELEMENTOS DEL JUEGO */
         .jugador {
+            display: none;
             position: absolute;
             bottom: 120px; 
             width: 60px;
             height: 60px;
-            background-image: url('tu_foto.png'); /* Por defecto Leonardo */
             background-size: cover;
             background-position: center;
             z-index: 6;
@@ -79,7 +145,6 @@
             position: absolute;
             width: 55px;
             height: 55px;
-            background-image: url('foto_novia.png'); /* Por defecto cae Chari */
             background-size: cover;
             background-position: center;
             z-index: 6;
@@ -94,25 +159,33 @@
             z-index: 7;
         }
 
-        /* CUADROS BOTONES TÁCTILES SOBRE LA RAYA (60px x 60px) */
-        #controles-movil {
+        /* ZONA DE DISPARO GENERAL (Toda la pantalla) */
+        #zona-disparo {
             position: absolute;
-            bottom: 120px; /* Exactamente alineado verticalmente con el jugador sobre la raya */
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 20; /* Por debajo de la interfaz y botones, por encima del fondo */
+        }
+
+        /* CUADROS BOTONES TÁCTILES EN LAS ESQUINAS */
+        #controles-movil {
+            display: none; /* Se activa al empezar */
+            position: absolute;
+            bottom: 120px; 
             left: 0;
             width: 100%;
-            height: 60px; /* Mismo tamaño de alto del jugador */
-            padding: 0 10px; /* Pequeño margen en las esquinas */
-            z-index: 40;
+            height: 60px;
+            padding: 0 10px;
+            z-index: 40; /* Por encima de la zona de disparo */
             display: flex;
-            justify-content: space-between; /* Uno a la izquierda y otro a la derecha */
-            pointer-events: none; /* Deja pasar clicks al fondo si es necesario */
+            justify-content: space-between;
+            pointer-events: none;
         }
         .boton-cuadro {
-            width: 60px;  /* Mismo tamaño del jugador */
-            height: 60px; /* Mismo tamaño del jugador */
-            background: rgba(255, 105, 180, 0.65); /* Rosado semitransparente estético */
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 105, 180, 0.7);
             border: 2px solid #fff;
-            border-radius: 8px; /* Cuadrado con bordes ligeramente suaves */
+            border-radius: 8px;
             color: white;
             font-size: 24px;
             font-weight: bold;
@@ -121,7 +194,7 @@
             align-items: center;
             box-shadow: 0 3px 6px rgba(0,0,0,0.15);
             touch-action: none;
-            pointer-events: auto; /* Reactiva los toques en los botones */
+            pointer-events: auto;
         }
         .boton-cuadro:active {
             background: #ff1493;
@@ -136,24 +209,21 @@
             z-index: 100; flex-direction: column; justify-content: center;
             align-items: center; padding: 25px; text-align: center;
         }
-        /* Final 1: Tiempo completado (Carta Bonita) */
         #final-tiempo { background: rgba(255, 192, 203, 0.98); }
         .carta-contenido {
             background: white; padding: 25px; border-radius: 15px;
             border: 3px dashed #ff1493; box-shadow: 0 8px 20px rgba(0,0,0,0.15); max-width: 90%;
         }
-        .carta-contenido h2 { color: #ff1493; margin-bottom: 15px; font-size: 24px; }
-        .carta-contenido p { color: #4a4a4a; font-size: 16px; line-height: 1.5; margin-bottom: 15px; }
+        .carta-contenido h2 { color: #ff1493; margin-bottom: 15px; font-size: 22px; }
+        .carta-contenido p { color: #4a4a4a; font-size: 15px; line-height: 1.5; margin-bottom: 15px; }
         
-        /* Final 2: Cruza la línea (NUEVO FONDO DE PANTALLA) */
         #final-linea { 
             background-image: url('fondo_abrazo.png'); 
             background-size: cover;
             background-position: center;
         }
-        #mensaje-rojo { color: red; font-size: 36px; font-weight: bold; margin-bottom: 25px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); animation: latido 0.6s infinite alternate; }
+        #mensaje-rojo { color: red; font-size: 34px; font-weight: bold; margin-bottom: 25px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); animation: latido 0.6s infinite alternate; }
         
-        /* Contenedor de las dos fotos juntas */
         .contenedor-abrazo-fotos {
             display: block;
             text-align: center;
@@ -168,17 +238,8 @@
             border: 4px solid #ff69b4;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        #foto-el {
-            background-image: url('tu_foto.png');
-            border-radius: 15px 0 0 15px;
-            margin-right: -2px;
-        }
-        #foto-ella {
-            background-image: url('foto_novia.png');
-            border-radius: 0 15px 15px 0;
-            margin-left: -2px;
-        }
-
+        #foto-el { border-radius: 15px 0 0 15px; margin-right: -2px; }
+        #foto-ella { border-radius: 0 15px 15px 0; margin-left: -2px; }
         #corazon-central {
             width: 80px; height: 80px; background-image: url('corazon.png');
             background-size: cover; background-position: center; opacity: 0.95; animation: latido 0.6s infinite alternate;
@@ -192,6 +253,24 @@
 <body>
 
     <div id="contenedor-juego">
+        
+        <div id="pantalla-seleccion">
+            <h1>¿Quién va a jugar? 💞</h1>
+            <p>Elige tu personaje para iniciar la partida</p>
+            <div class="contenedor-opciones">
+                <div class="tarjeta-personaje" onclick="seleccionarModo('leonardo')">
+                    <div id="avatar-leo" class="avatar-seleccion"></div>
+                    <span>Leonardo</span>
+                </div>
+                <div class="tarjeta-personaje" onclick="seleccionarModo('chari')">
+                    <div id="avatar-chari" class="avatar-seleccion"></div>
+                    <span>Chari</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="zona-disparo"></div>
+
         <div id="interfaz">
             <div class="placa-info">Amor: <span id="puntos">0</span></div>
             <div class="placa-info">Tiempo: <span id="tiempo">60</span>s</div>
@@ -207,21 +286,19 @@
 
         <div id="final-tiempo" class="pantalla-final">
             <div class="carta-contenido">
-                <h2>De: Leonardo para Chari ❤️</h2>
-                <p>¡Felicidades, mi amor! Lograste aguantar toda la ráfaga de mi amor por un minuto entero.</p>
-                <p>Cada segundo que pasa me doy cuenta de que eres lo mejor de mi vida y que este amor crece de forma infinita.</p>
+                <h2 id="titulo-carta">De: Leonardo para Chari ❤️</h2>
+                <p id="texto-carta-1">¡Felicidades, mi amor! Lograste aguantar toda la ráfaga de mi amor por un minuto entero.</p>
+                <p id="texto-carta-2">Cada segundo que pasa me doy cuenta de que eres lo mejor de mi vida y que este amor crece de forma infinita.</p>
                 <p style="font-weight: bold; color: #ff69b4; font-size: 18px;">¡Eres mi vida entera! ✨👑</p>
             </div>
         </div>
 
         <div id="final-linea" class="pantalla-final">
             <h1 id="mensaje-rojo">❤️ ¡Te amooooo! ❤️</h1>
-            
             <div class="contenedor-abrazo-fotos">
                 <div id="foto-el" class="foto-abrazo"></div>
                 <div id="foto-ella" class="foto-abrazo"></div>
             </div>
-
             <div id="corazon-central"></div>
         </div>
     </div>
@@ -237,11 +314,15 @@
         let jugadorX = 210;
         const velocidadJugador = 7.5;
         let anchoContenedor = contenedor.clientWidth;
-        let juegoActivo = true; 
+        let juegoActivo = false; // Se activa al elegir personaje
         
+        let modoElegido = ""; 
+        let fotoJugador = "";
+        let fotoCaedor = "";
+
         let velocidadCaidaBase = 2.2;
         let tiempoSpawnBase = 1600;
-        let intervaloGenerador;
+        let intervaloGenerador, intervaloTiempo, intervaloDificultad;
 
         function reproducirSonido(ruta, bucle = false) {
             let audio = new Audio(ruta);
@@ -251,63 +332,91 @@
             return audio;
         }
 
-        // Bucle e intervalos automáticos de inicio inmediato
-        intervaloGenerador = setInterval(generarCaedor, tiempoSpawnBase);
-        const intervaloTiempo = setInterval(reducirTiempo, 1000);
-        const intervaloDificultad = setInterval(aumentarDificultad, 10000); 
+        // CONTROL DE MODOS DE JUEGO
+        function seleccionarModo(modo) {
+            modoElegido = modo;
+            document.getElementById('pantalla-seleccion').style.display = 'none';
+            document.getElementById('interfaz').style.display = 'flex';
+            document.getElementById('controles-movil').style.display = 'flex';
+            jugador.style.display = 'block';
+
+            if (modo === 'leonardo') {
+                fotoJugador = 'tu_foto.png';
+                fotoCaedor = 'foto_novia.png';
+                document.getElementById('titulo-carta').innerText = "De: Leonardo para Chari ❤️";
+                document.getElementById('texto-carta-1').innerText = "¡Felicidades, mi amor! Lograste atrapar toda la ráfaga de mi amor por un minuto entero.";
+            } else {
+                fotoJugador = 'foto_novia.png';
+                fotoCaedor = 'tu_foto.png';
+                document.getElementById('titulo-carta').innerText = "De: Chari para Leonardo ❤️";
+                document.getElementById('texto-carta-1').innerText = "¡Felicidades, mi rey! Lograste atrapar toda la ráfaga de mi amor por un minuto entero.";
+            }
+
+            jugador.style.backgroundImage = `url('${fotoJugador}')`;
+            document.getElementById('foto-el').style.backgroundImage = `url('tu_foto.png')`;
+            document.getElementById('foto-ella').style.backgroundImage = `url('foto_novia.png')`;
+
+            // Iniciar Juego
+            juegoActivo = true;
+            intervaloGenerador = setInterval(generarCaedor, tiempoSpawnBase);
+            intervaloTiempo = setInterval(reducirTiempo, 1000);
+            intervaloDificultad = setInterval(aumentarDificultad, 10000);
+            requestAnimationFrame(actualizarJuego);
+        }
 
         // VARIABLES DE CONTROL DE ENTRADAS
         window.teclas = {};
 
-        // 1. Teclado (PC)
+        // Movimiento por Teclado (PC)
         window.addEventListener('keydown', (e) => { if(juegoActivo) teclas[e.code] = true; });
         window.addEventListener('keyup', (e) => { teclas[e.code] = false; });
+        window.addEventListener('keypress', (e) => {
+            if(juegoActivo && (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp')) {
+                crearCorazon();
+            }
+        });
 
-        // 2. Control por los nuevos cuadros en las esquinas superiores de la línea (Android)
+        // Controles Táctiles de Movimiento (Android - En las esquinas)
         document.getElementById('btn-izquierda').addEventListener('touchstart', (e) => {
-            e.preventDefault();
+            e.preventDefault(); e.stopPropagation();
             teclas['ArrowLeft'] = true;
         });
         document.getElementById('btn-izquierda').addEventListener('touchend', (e) => {
-            e.preventDefault();
-            teclas['ArrowLeft'] = false;
-        });
-        document.getElementById('btn-izquierda').addEventListener('touchcancel', (e) => {
-            e.preventDefault();
+            e.preventDefault(); e.stopPropagation();
             teclas['ArrowLeft'] = false;
         });
 
         document.getElementById('btn-derecha').addEventListener('touchstart', (e) => {
-            e.preventDefault();
+            e.preventDefault(); e.stopPropagation();
             teclas['ArrowRight'] = true;
         });
         document.getElementById('btn-derecha').addEventListener('touchend', (e) => {
-            e.preventDefault();
+            e.preventDefault(); e.stopPropagation();
             teclas['ArrowRight'] = false;
         });
-        document.getElementById('btn-derecha').addEventListener('touchcancel', (e) => {
+
+        // DISPARO MANUAL CON UN TOQUE (Android / PC Click)
+        // Al tocar cualquier parte de la zona de disparo, se genera un solo corazón
+        document.getElementById('zona-disparo').addEventListener('touchstart', (e) => {
+            if (!juegoActivo) return;
             e.preventDefault();
-            teclas['ArrowRight'] = false;
+            crearCorazon();
+        });
+        document.getElementById('zona-disparo').addEventListener('mousedown', (e) => {
+            if (!juegoActivo) return;
+            crearCorazon();
         });
 
         let corazones = [];
         let caedores = [];
-        let tiempoUltimoDisparo = 0;
-        const cadenciaDisparo = 140; // Ráfaga automática continua
 
-        function actualizarJuego(tiempoActual) {
+        function actualizarJuego() {
             if (!juegoActivo) return;
 
-            // Movimiento estable
+            // Procesar Movimientos
             if (teclas['ArrowLeft'] || teclas['KeyA']) { if (jugadorX > 0) jugadorX -= velocidadJugador; }
             if (teclas['ArrowRight'] || teclas['KeyD']) { if (jugadorX < anchoContenedor - 60) jugadorX += velocidadJugador; }
             jugador.style.left = jugadorX + 'px';
-
-            // DISPARO AUTOMÁTICO CONTINUO
-            if (tiempoActual - tiempoUltimoDisparo > cadenciaDisparo) {
-                crearCorazon();
-                tiempoUltimoDisparo = tiempoActual;
-            }
 
             // Mover corazones hacia arriba
             for (let i = corazones.length - 1; i >= 0; i--) {
@@ -324,7 +433,7 @@
                 n.y += velocidadCaidaBase;
                 n.element.style.top = n.y + 'px';
 
-                // Detectar impactos
+                // Detectar colisiones con corazones
                 for (let j = corazones.length - 1; j >= 0; j--) {
                     let c = corazones[j];
                     if (detectarChoque(c, n)) {
@@ -337,7 +446,7 @@
                     }
                 }
 
-                // Si toca el suelo pierde/abrazo
+                // Si cruza la línea del suelo
                 if (n.y > limiteSueloY) {
                     finalizarAbrazo();
                     return;
@@ -361,6 +470,7 @@
             if (!juegoActivo) return;
             const elem = document.createElement('div');
             elem.className = 'caedor';
+            elem.style.backgroundImage = `url('${fotoCaedor}')`;
             let x = Math.floor(Math.random() * (anchoContenedor - 55));
             let y = -60;
             elem.style.left = x + 'px'; elem.style.top = y + 'px';
@@ -374,9 +484,9 @@
 
         function aumentarDificultad() {
             if (!juegoActivo) return;
-            velocidadCaidaBase += 0.5; 
-            if (tiempoSpawnBase > 600) {
-                tiempoSpawnBase -= 200; 
+            velocidadCaidaBase += 0.4; 
+            if (tiempoSpawnBase > 700) {
+                tiempoSpawnBase -= 150; 
                 clearInterval(intervaloGenerador);
                 intervaloGenerador = setInterval(generarCaedor, tiempoSpawnBase);
             }
@@ -413,10 +523,8 @@
             corazones.forEach(c => c.element.remove());
             caedores.forEach(n => n.element.remove());
             document.getElementById('controles-movil').style.display = 'none';
+            document.getElementById('zona-disparo').style.display = 'none';
         }
-
-        // Iniciar loop animado
-        requestAnimationFrame(actualizarJuego);
     </script>
 </body>
 </html>
