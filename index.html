@@ -324,20 +324,28 @@
         // CONTROLES TÁCTILES CONTINUOS (MÓVIL)
         document.getElementById('btn-izquierda').addEventListener('touchstart', (e) => { 
             e.preventDefault(); 
-            e.stopPropagation(); // Evita disparar al tocar el botón
+            e.stopPropagation(); 
             teclas['ArrowLeft'] = true; 
         });
         document.getElementById('btn-izquierda').addEventListener('touchend', (e) => { 
             e.preventDefault(); 
             teclas['ArrowLeft'] = false; 
         });
+        document.getElementById('btn-izquierda').addEventListener('touchcancel', (e) => { 
+            e.preventDefault(); 
+            teclas['ArrowLeft'] = false; 
+        });
         
         document.getElementById('btn-derecha').addEventListener('touchstart', (e) => { 
             e.preventDefault(); 
-            e.stopPropagation(); // Evita disparar al tocar el botón
+            e.stopPropagation(); 
             teclas['ArrowRight'] = true; 
         });
         document.getElementById('btn-derecha').addEventListener('touchend', (e) => { 
+            e.preventDefault(); 
+            teclas['ArrowRight'] = false; 
+        });
+        document.getElementById('btn-derecha').addEventListener('touchcancel', (e) => { 
             e.preventDefault(); 
             teclas['ArrowRight'] = false; 
         });
@@ -345,12 +353,14 @@
         // TOQUE EN LA PANTALLA GENERAL PARA DISPARAR (¡Tac tac!)
         contenedor.addEventListener('touchstart', (e) => {
             if (!juegoActivo) return;
-            // Solo activa disparo si no está tocando los botones direccionales
             if (e.target.id !== 'btn-izquierda' && e.target.id !== 'btn-derecha') {
                 toqueDisparoActivo = true;
             }
         });
         contenedor.addEventListener('touchend', () => {
+            toqueDisparoActivo = false;
+        });
+        contenedor.addEventListener('touchcancel', () => {
             toqueDisparoActivo = false;
         });
 
@@ -362,7 +372,7 @@
         function actualizarJuego(tiempoActual) {
             if (!juegoActivo) return;
 
-            // Movimiento continuo (Se mantiene activo mientras el valor sea true)
+            // Movimiento continuo estable
             if (teclas['ArrowLeft'] || teclas['KeyA']) { if (jugadorX > 0) jugadorX -= velocidadJugador; }
             if (teclas['ArrowRight'] || teclas['KeyD']) { if (jugadorX < anchoContenedor - 60) jugadorX += velocidadJugador; }
             jugador.style.left = jugadorX + 'px';
@@ -457,6 +467,7 @@
 
         function finalizarPorTiempo() {
             limpiarPantalla();
+            reproducirSonido('sonidos/victoria.mp3', true);
             
             const tCarta = document.getElementById('titulo-carta');
             const p1 = document.getElementById('parrafo-carta-1');
@@ -477,7 +488,7 @@
 
         function finalizarAbrazo() {
             limpiarPantalla();
-            reproducirSonido('sonidos/abrazo.mp3', true);
+            reproducirSonido('sonidos/victoria.mp3', true);
             document.getElementById('final-linea').style.display = 'flex';
         }
 
