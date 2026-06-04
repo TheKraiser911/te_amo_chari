@@ -37,7 +37,6 @@
         }
         /* Interfaz de usuario superior */
         #interfaz {
-            display: none;
             position: absolute;
             top: 15px;
             left: 0;
@@ -71,6 +70,7 @@
             bottom: 120px; 
             width: 60px;
             height: 60px;
+            background-image: url('tu_foto.png'); /* Por defecto Leonardo */
             background-size: cover;
             background-position: center;
             z-index: 6;
@@ -79,6 +79,7 @@
             position: absolute;
             width: 55px;
             height: 55px;
+            background-image: url('foto_novia.png'); /* Por defecto cae Chari */
             background-size: cover;
             background-position: center;
             z-index: 6;
@@ -93,61 +94,23 @@
             z-index: 7;
         }
 
-        /* MENU DE SELECCIÓN */
-        #pantalla-menu {
+        /* CUADROS TÁCTILES INVISIBLES ANDROID (ZONAS DE MOVIMIENTO) */
+        #zonas-tactiles {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 240, 245, 0.95);
-            z-index: 50;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 40; /* Por encima del fondo y personajes, por debajo de la interfaz */
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
         }
-        #pantalla-menu h1 { color: #ff1493; margin-bottom: 30px; font-size: 28px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-        .btn-menu {
-            width: 85%;
-            padding: 15px;
-            margin: 10px 0;
-            background: white;
-            border: 3px solid #ff69b4;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff1493;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            cursor: pointer;
-        }
-        .btn-menu:active { background: #ffe4e1; transform: scale(0.98); }
-
-        /* CONTROLES ANDROID TOTALMENTE OPTIMIZADOS */
-        #controles-movil {
-            display: none; 
-            position: absolute;
-            bottom: 15px; 
-            left: 15px;
-            height: 80px; 
-            z-index: 40; /* Por encima del fondo pero permite clicks arriba */
-        }
-        .grupo-izquierdo { display: flex; gap: 20px; }
-        .boton-tactil {
-            width: 75px; 
-            height: 75px; 
-            background: rgba(255, 105, 180, 0.75);
-            border: 3px solid #fff; 
-            border-radius: 50%; /* Redondos para mejor ergonomía de pulgar tipo Pou */
-            color: white;
-            font-size: 32px; 
-            font-weight: bold; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        .zona-lado {
+            width: 50%;
+            height: 100%;
             touch-action: none;
+            /* Descomenta la línea de abajo si quieres ver los cuadros para probar */
+            /* background: rgba(255, 0, 0, 0.05); border: 1px dashed red; */
         }
-        .boton-tactil:active { background: #ff1493; transform: scale(0.95); }
 
         /* PANTALLAS DE FINAL */
         .pantalla-final {
@@ -213,12 +176,6 @@
 <body>
 
     <div id="contenedor-juego">
-        <div id="pantalla-menu">
-            <h1>¿Quién quieres ser hoy? 💞</h1>
-            <button class="btn-menu" onclick="iniciarJuego('leonardo')">Soy Leonardo</button>
-            <button class="btn-menu" onclick="iniciarJuego('chari')">Soy Chari</button>
-        </div>
-
         <div id="interfaz">
             <div class="placa-info">Amor: <span id="puntos">0</span></div>
             <div class="placa-info">Tiempo: <span id="tiempo">60</span>s</div>
@@ -227,18 +184,16 @@
         <div id="linea-suelo"></div>
         <div id="jugador" class="jugador" style="left: 210px;"></div>
 
-        <div id="controles-movil">
-            <div class="grupo-izquierdo">
-                <div id="btn-izquierda" class="boton-tactil">◀</div>
-                <div id="btn-derecha" class="boton-tactil">▶</div>
-            </div>
+        <div id="zonas-tactiles">
+            <div id="zona-izquierda" class="zona-lado"></div>
+            <div id="zona-derecha" class="zona-lado"></div>
         </div>
 
         <div id="final-tiempo" class="pantalla-final">
             <div class="carta-contenido">
-                <h2 id="titulo-carta"></h2>
-                <p id="parrafo-carta-1"></p>
-                <p id="parrafo-carta-2"></p>
+                <h2>De: Leonardo para Chari ❤️</h2>
+                <p>¡Felicidades, mi amor! Lograste aguantar toda la ráfaga de mi amor por un minuto entero.</p>
+                <p>Cada segundo que pasa me doy cuenta de que eres lo mejor de mi vida y que este amor crece de forma infinita.</p>
                 <p style="font-weight: bold; color: #ff69b4; font-size: 18px;">¡Eres mi vida entera! ✨👑</p>
             </div>
         </div>
@@ -260,21 +215,17 @@
         const jugador = document.getElementById('jugador');
         const textoPuntos = document.getElementById('puntos');
         const textoTiempo = document.getElementById('tiempo');
-        const controlesMovil = document.getElementById('controles-movil');
         
         let puntos = 0;
         let tiempoRestante = 60;
         let jugadorX = 210;
         const velocidadJugador = 7.5;
         let anchoContenedor = contenedor.clientWidth;
-        let juegoActivo = false;
+        let juegoActivo = true; // Inicia activado directamente
         
         let velocidadCaidaBase = 2.2;
         let tiempoSpawnBase = 1600;
         let intervaloGenerador;
-
-        let modoElegido = ""; 
-        let imagenCaedor = ""; 
 
         function reproducirSonido(ruta, bucle = false) {
             let audio = new Audio(ruta);
@@ -284,107 +235,65 @@
             return audio;
         }
 
-        function iniciarJuego(rol) {
-            document.getElementById('pantalla-menu').style.display = 'none';
-            document.getElementById('interfaz').style.display = 'flex';
-            modoElegido = rol;
-            juegoActivo = true;
+        // Bucle e intervalos automáticos de inicio
+        intervaloGenerador = setInterval(generarCaedor, tiempoSpawnBase);
+        const intervaloTiempo = setInterval(reducirTiempo, 1000);
+        const intervaloDificultad = setInterval(aumentarDificultad, 10000); 
 
-            if (modoElegido === 'leonardo') {
-                jugador.style.backgroundImage = "url('tu_foto.png')";
-                imagenCaedor = "url('foto_novia.png')";
-            } else {
-                jugador.style.backgroundImage = "url('foto_novia.png')";
-                imagenCaedor = "url('tu_foto.png')";
-            }
-
-            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-                controlesMovil.style.display = 'block';
-            }
-
-            intervaloGenerador = setInterval(generarCaedor, tiempoSpawnBase);
-            setInterval(reducirTiempo, 1000);
-            setInterval(aumentarDificultad, 10000); 
-
-            requestAnimationFrame(actualizarJuego);
-        }
-
-        // CONTROL DE ENTRADAS GENERAL
+        // VARIABLES DE CONTROL DE ENTRADAS
         window.teclas = {};
-        let toqueDisparoActivo = false;
 
-        // Teclado (PC)
+        // 1. Detección de Teclado (PC)
         window.addEventListener('keydown', (e) => { if(juegoActivo) teclas[e.code] = true; });
         window.addEventListener('keyup', (e) => { teclas[e.code] = false; });
-        
-        // Mouse (PC) - Click para ráfaga continua
-        contenedor.addEventListener('mousedown', (e) => { if(juegoActivo && e.button === 0) teclas['MouseClick'] = true; });
-        contenedor.addEventListener('mouseup', () => { teclas['MouseClick'] = false; });
 
-        // CONTROLES TÁCTILES CONTINUOS (MÓVIL)
-        document.getElementById('btn-izquierda').addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            e.stopPropagation(); 
-            teclas['ArrowLeft'] = true; 
+        // 2. Control por zonas táctiles (Android)
+        document.getElementById('zona-izquierda').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            teclas['ArrowLeft'] = true;
         });
-        document.getElementById('btn-izquierda').addEventListener('touchend', (e) => { 
-            e.preventDefault(); 
-            teclas['ArrowLeft'] = false; 
+        document.getElementById('zona-izquierda').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            teclas['ArrowLeft'] = false;
         });
-        document.getElementById('btn-izquierda').addEventListener('touchcancel', (e) => { 
-            e.preventDefault(); 
-            teclas['ArrowLeft'] = false; 
-        });
-        
-        document.getElementById('btn-derecha').addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            e.stopPropagation(); 
-            teclas['ArrowRight'] = true; 
-        });
-        document.getElementById('btn-derecha').addEventListener('touchend', (e) => { 
-            e.preventDefault(); 
-            teclas['ArrowRight'] = false; 
-        });
-        document.getElementById('btn-derecha').addEventListener('touchcancel', (e) => { 
-            e.preventDefault(); 
-            teclas['ArrowRight'] = false; 
+        document.getElementById('zona-izquierda').addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            teclas['ArrowLeft'] = false;
         });
 
-        // TOQUE EN LA PANTALLA GENERAL PARA DISPARAR (¡Tac tac!)
-        contenedor.addEventListener('touchstart', (e) => {
-            if (!juegoActivo) return;
-            if (e.target.id !== 'btn-izquierda' && e.target.id !== 'btn-derecha') {
-                toqueDisparoActivo = true;
-            }
+        document.getElementById('zona-derecha').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            teclas['ArrowRight'] = true;
         });
-        contenedor.addEventListener('touchend', () => {
-            toqueDisparoActivo = false;
+        document.getElementById('zona-derecha').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            teclas['ArrowRight'] = false;
         });
-        contenedor.addEventListener('touchcancel', () => {
-            toqueDisparoActivo = false;
+        document.getElementById('zona-derecha').addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            teclas['ArrowRight'] = false;
         });
 
         let corazones = [];
         let caedores = [];
         let tiempoUltimoDisparo = 0;
-        const cadenciaDisparo = 140; 
+        const cadenciaDisparo = 140; // Ráfaga automática fluida cada 140ms
 
         function actualizarJuego(tiempoActual) {
             if (!juegoActivo) return;
 
-            // Movimiento continuo estable
+            // Movimiento basado en teclas físicas o zonas móviles táctiles
             if (teclas['ArrowLeft'] || teclas['KeyA']) { if (jugadorX > 0) jugadorX -= velocidadJugador; }
             if (teclas['ArrowRight'] || teclas['KeyD']) { if (jugadorX < anchoContenedor - 60) jugadorX += velocidadJugador; }
             jugador.style.left = jugadorX + 'px';
 
-            // Activar disparo con Teclado, Mouse o Toque rápido de pantalla
-            if (teclas['Space'] || teclas['ArrowUp'] || teclas['MouseClick'] || toqueDisparoActivo) {
-                if (tiempoActual - tiempoUltimoDisparo > cadenciaDisparo) {
-                    crearCorazon();
-                    tiempoUltimoDisparo = tiempoActual;
-                }
+            // DISPARO AUTOMÁTICO CONTINUO: Siempre dispara si el juego está corriendo
+            if (tiempoActual - tiempoUltimoDisparo > cadenciaDisparo) {
+                crearCorazon();
+                tiempoUltimoDisparo = tiempoActual;
             }
 
+            // Mover corazones hacia arriba
             for (let i = corazones.length - 1; i >= 0; i--) {
                 let c = corazones[i];
                 c.y -= 9; c.element.style.top = c.y + 'px';
@@ -393,11 +302,13 @@
 
             let limiteSueloY = contenedor.clientHeight - 114;
 
+            // Mover caedores hacia abajo
             for (let i = caedores.length - 1; i >= 0; i--) {
                 let n = caedores[i];
                 n.y += velocidadCaidaBase;
                 n.element.style.top = n.y + 'px';
 
+                // Detectar impactos
                 for (let j = corazones.length - 1; j >= 0; j--) {
                     let c = corazones[j];
                     if (detectarChoque(c, n)) {
@@ -410,6 +321,7 @@
                     }
                 }
 
+                // Si toca el suelo pierde/abrazo
                 if (n.y > limiteSueloY) {
                     finalizarAbrazo();
                     return;
@@ -433,7 +345,6 @@
             if (!juegoActivo) return;
             const elem = document.createElement('div');
             elem.className = 'caedor';
-            elem.style.backgroundImage = imagenCaedor;
             let x = Math.floor(Math.random() * (anchoContenedor - 55));
             let y = -60;
             elem.style.left = x + 'px'; elem.style.top = y + 'px';
@@ -468,21 +379,6 @@
         function finalizarPorTiempo() {
             limpiarPantalla();
             reproducirSonido('sonidos/victoria.mp3', true);
-            
-            const tCarta = document.getElementById('titulo-carta');
-            const p1 = document.getElementById('parrafo-carta-1');
-            const p2 = document.getElementById('parrafo-carta-2');
-
-            if (modoElegido === 'leonardo') {
-                tCarta.innerText = "De: Leonardo para Chari ❤️";
-                p1.innerText = "¡Felicidades, mi amor! Lograste aguantar toda la ráfaga de mi amor por un minuto entero.";
-                p2.innerText = "Cada segundo que pasa me doy cuenta de que eres lo mejor de mi vida y que este amor crece de forma infinita.";
-            } else {
-                tCarta.innerText = "De: Leonardo para Chari 💖";
-                p1.innerText = "¡Viste que te amo demasiado, Chari hermosa! Programé esto especialmente para ti.";
-                p2.innerText = "No importa la velocidad ni las dificultades, mi misión siempre será llenarte de corazones y hacerte sonreír todos los días.";
-            }
-
             document.getElementById('final-tiempo').style.display = 'flex';
         }
 
@@ -494,13 +390,17 @@
 
         function limpiarPantalla() {
             juegoActivo = false;
-            toqueDisparoActivo = false;
-            for (let i = 1; i < 999; i++) window.clearInterval(i);
+            clearInterval(intervaloGenerador);
+            clearInterval(intervaloTiempo);
+            clearInterval(intervaloDificultad);
             
             corazones.forEach(c => c.element.remove());
             caedores.forEach(n => n.element.remove());
-            controlesMovil.style.display = 'none';
+            document.getElementById('zonas-tactiles').style.display = 'none';
         }
+
+        // Iniciar el bucle de renderizado animado
+        requestAnimationFrame(actualizarJuego);
     </script>
 </body>
 </html>
